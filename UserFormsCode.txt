@@ -1,0 +1,99 @@
+' ==========================
+' frmEmployeeMaster controls:
+' txtName, txtAccountNo, txtIFSC, txtBranch, lblEmpCode, btnSave, btnClose
+' ==========================
+Private Sub UserForm_Initialize()
+    lblEmpCode.Caption = "Auto on Save"
+End Sub
+
+Private Sub btnSave_Click()
+    If AddEmployeeRecord(txtName.Text, txtAccountNo.Text, txtIFSC.Text, txtBranch.Text) Then
+        MsgBox "Employee saved successfully.", vbInformation
+        txtName.Text = "": txtAccountNo.Text = "": txtIFSC.Text = "": txtBranch.Text = ""
+        txtName.SetFocus
+        RefreshDashboard
+    End If
+End Sub
+
+Private Sub btnClose_Click()
+    Unload Me
+End Sub
+
+' ==========================
+' frmSalaryEntry controls:
+' txtDate, cboEmpName, txtAccountNo, txtIFSC, txtBranch, txtAmount, txtNarration, btnSave, btnClose
+' ==========================
+Private Sub UserForm_Initialize()
+    Dim ws As Worksheet, lr As Long, i As Long
+    Set ws = ThisWorkbook.Worksheets(MASTER_SHEET)
+    lr = LastRow(ws, "A")
+
+    cboEmpName.Clear
+    For i = 2 To lr
+        If Trim(ws.Cells(i, 2).Value) <> "" Then cboEmpName.AddItem ws.Cells(i, 2).Value
+    Next i
+
+    txtDate.Text = Format(Date, "dd-mm-yyyy")
+End Sub
+
+Private Sub cboEmpName_Change()
+    Dim ec As String, acc As String, ifsc As String, br As String
+    If FindEmployee(cboEmpName.Text, ec, acc, ifsc, br) Then
+        txtAccountNo.Text = acc
+        txtIFSC.Text = ifsc
+        txtBranch.Text = br
+    End If
+End Sub
+
+Private Sub btnSave_Click()
+    If AddSalaryEntry(CDate(txtDate.Text), cboEmpName.Text, txtAmount.Text, txtNarration.Text) Then
+        MsgBox "Salary entry saved.", vbInformation
+        txtAmount.Text = "": txtNarration.Text = ""
+        RefreshDashboard
+    End If
+End Sub
+
+Private Sub btnClose_Click()
+    Unload Me
+End Sub
+
+' ==========================
+' frmExpenseEntry controls:
+' txtDate, txtName, txtAccountNo, txtIFSC, txtAmount, txtNarration, btnSave, btnClose
+' ==========================
+Private Sub UserForm_Initialize()
+    txtDate.Text = Format(Date, "dd-mm-yyyy")
+End Sub
+
+Private Sub btnSave_Click()
+    If AddExpenseEntry(CDate(txtDate.Text), txtName.Text, txtAccountNo.Text, txtIFSC.Text, txtAmount.Text, txtNarration.Text) Then
+        MsgBox "Expense entry saved.", vbInformation
+        txtName.Text = "": txtAccountNo.Text = "": txtIFSC.Text = "": txtAmount.Text = "": txtNarration.Text = ""
+        RefreshDashboard
+    End If
+End Sub
+
+Private Sub btnClose_Click()
+    Unload Me
+End Sub
+
+' ==========================
+' frmEmployeeSearch controls:
+' txtSearchName, lblEmpCode, lblName, lblAccount, lblIFSC, lblBranch, btnFind, btnClose
+' ==========================
+Private Sub btnFind_Click()
+    Dim ec As String, acc As String, ifsc As String, br As String
+    If FindEmployee(txtSearchName.Text, ec, acc, ifsc, br) Then
+        lblEmpCode.Caption = ec
+        lblName.Caption = txtSearchName.Text
+        lblAccount.Caption = acc
+        lblIFSC.Caption = ifsc
+        lblBranch.Caption = br
+    Else
+        MsgBox "Employee not found.", vbExclamation
+    End If
+End Sub
+
+Private Sub btnClose_Click()
+    Unload Me
+End Sub
